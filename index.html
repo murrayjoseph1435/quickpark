@@ -1133,8 +1133,11 @@ async function doLogin() {
   toast('Signing in…','ok');
   try {
     const users = await dbGet('customers', `email=eq.${encodeURIComponent(email)}&select=*`);
-    if (!users || users.length === 0 || users[0].password !== pass) { toast('Invalid credentials. Please try again.','err'); return; }
     const user = users[0];
+    const dbPass = (user.password||'').trim();
+    const inputPass = (pass||'').trim();
+    console.log('DB pass:', JSON.stringify(dbPass), 'Input pass:', JSON.stringify(inputPass), 'Match:', dbPass===inputPass);
+    if (dbPass !== inputPass) { toast('Invalid credentials. Please try again.','err'); return; }
     if (authTabMode === 'admin' && user.role !== 'admin') { toast('This account does not have staff access.','err'); return; }
     if (authTabMode === 'customer' && user.role === 'admin') { toast('Staff accounts must use the Staff login.','err'); return; }
     await dbInsert('audit_log', {type:'blue', message:`User ${email} logged in`});
