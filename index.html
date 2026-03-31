@@ -1132,8 +1132,8 @@ async function doLogin() {
   if (!email || !pass) { toast('Please enter your email and password.','err'); return; }
   toast('Signing in…','ok');
   try {
-    const users = await dbGet('customers', `email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(pass)}&select=*`);
-    if (!users || users.length === 0) { toast('Invalid credentials. Please try again.','err'); return; }
+    const users = await dbGet('customers', `email=eq.${encodeURIComponent(email)}&select=*`);
+    if (!users || users.length === 0 || users[0].password !== pass) { toast('Invalid credentials. Please try again.','err'); return; }
     const user = users[0];
     if (authTabMode === 'admin' && user.role !== 'admin') { toast('This account does not have staff access.','err'); return; }
     if (authTabMode === 'customer' && user.role === 'admin') { toast('Staff accounts must use the Staff login.','err'); return; }
